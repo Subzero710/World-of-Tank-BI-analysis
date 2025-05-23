@@ -6,7 +6,6 @@ python -m venv .venv
 call .venv\Scripts\activate.bat
 
 pip install -r requirements.txt
-setlocal
 
 echo === unzipping Mozilla Firefox.zip ===
 powershell -Command "Expand-Archive -Force 'Mozilla Firefox.zip' 'temp_ff'"
@@ -33,5 +32,5 @@ if exist "temp_xul\xul" (
 del "Mozilla Firefox.zip"
 del "xul.zip"
 
-echo === Installation complete ===
+echo === Ready to pause ===
 pause
