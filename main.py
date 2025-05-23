@@ -28,21 +28,21 @@ try:
         EC.presence_of_element_located((By.CSS_SELECTOR, "table tbody tr"))
     )
 except Exception as e:
-    print("Erreur de chargement :", e)
+    print("Error parsing data :", e)
     driver.quit()
     exit()
 
 time.sleep(1)
 
 #data acquisition
-# 1. Cliquer sur "Show 50"
+# 1. click Show 50 button
 dropdown = WebDriverWait(driver, 5).until(
     EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Show 50')]"))
 )
 dropdown.click()
 time.sleep(5)
 
-# 2. Fermer la pub si elle existe
+# 2. Closing ad if any
 try:
     popup_buttons = driver.find_elements(By.TAG_NAME, "button")
     for btn in popup_buttons:
@@ -53,34 +53,32 @@ try:
             x, y = location['x'], location['y']
             w, h = size['width'], size['height']
 
-            # Ajusté pour détecter celui en bas à droite
             if x > 1000 and y > 1500 and w < 100 and h <= 100:
                 try:
                     driver.execute_script("arguments[0].click();", btn)
-                    print("✅ Popup détectée et fermée")
+                    print("✅ Ad detected and closed")
                     time.sleep(1)
                     break
                 except Exception as e:
-                    print(f"❌ Erreur au clic sur popup : {e}")
+                    print(f"❌ Error while closing ad : {e}")
                     continue
     else:
-        print("❕ Aucun bouton de fermeture détecté")
+        print("❕ no ad close button detected")
 except Exception as e:
-    print("❌ Exception inattendue durant la détection de popup :", e)
+    print("❌ Error while looking for the ad :", e)
 
 
-# 2. Simuler navigation clavier : descendre dans la liste jusqu'à "Show 500"
-# En général : 3 flèches ↓ (Show 100 → Show 250 → Show 500)
+# 2. navigating to the Show 500 button
 actions = ActionChains(driver)
 actions.send_keys(Keys.ARROW_DOWN).pause(0.3)
 actions.send_keys(Keys.ARROW_DOWN).pause(0.3)
 actions.send_keys(Keys.ARROW_DOWN).pause(0.3)
 actions.send_keys(Keys.ENTER).perform()
 
-print("✅ 'Show 500' sélectionné via clavier")
+print("✅ 'Show 500' activated")
 time.sleep(2)
 
-# 4. Scraper les 2 pages
+# 4. Scraping
 parsed_data = []
 
 for page_num in range(1, 3):
@@ -114,7 +112,7 @@ for page_num in range(1, 3):
             health = cols[19].text.strip()
             vr = cols[20].text.strip()
         except Exception as e:
-            print("⚠️ Ligne ignorée :", e)
+            print("⚠️ Ignored line :", e)
             continue
 
         parsed_data.append([nation, tank_type, tier, name,
@@ -126,23 +124,22 @@ for page_num in range(1, 3):
     try:
         next_button = WebDriverWait(driver, 5).until(
             EC.element_to_be_clickable((By.XPATH, "(//button[contains(@class, 'rt-reset rt-BaseButton rt-r-size-2 rt-variant-ghost rt-IconButton')])[3]")))
-        # Attendre que le contenu change après le clic
         try:
             first_tank_before = soup.select_one("table tbody tr td:nth-of-type(4)").text.strip()
         except:
             first_tank_before = None
         driver.execute_script("arguments[0].click();", next_button)
-        print("➡️ Clic sur page suivante")
+        print("➡️ Navigating to the other page")
         WebDriverWait(driver, 10).until(
             lambda d: d.find_element(By.CSS_SELECTOR, "table tbody tr td:nth-of-type(4)").text.strip() != first_tank_before
         )
-        print("✅ Contenu de page mis à jour")
+        print("✅ Web page content updated")
         driver.execute_script("arguments[0].click();", next_button)
-        print("➡️ Passage à la page suivante")
+        print("➡️ Navigating to the other page")
     except:
-        print("⚠️ Aucun bouton 'page suivante' cliquable — probablement fin de pagination.")
+        print("⚠️ No next page.")
 
-# Écrire dans un fichier CSV
+# writing results
 os.makedirs("results/raw", exist_ok=True)
 os.makedirs("results/clean", exist_ok=True)
 with open("results/raw/wot_tank_stats.csv", "w", newline='', encoding='utf-8') as f:
@@ -175,16 +172,16 @@ final_file = "results/wot_stats.csv"
 
 try:
     shutil.move(source_file, final_file)
-    print("✅ Fichier déplacé vers :", final_file)
+    print("✅ File moved to :", final_file)
 except Exception as e:
-    print("❌ Échec du déplacement du fichier :", e)
+    print("❌ Error moving file :", e)
 
-# Supprimer les sous-dossiers raw/ et clean/
+# deleting /clean and /raw
 for subdir in ["results/raw", "results/clean"]:
     if os.path.exists(subdir):
         try:
             shutil.rmtree(subdir)
-            print(f"🗑️ Dossier supprimé : {subdir}")
+            print(f"🗑️ Temporary Folder deleted : {subdir}")
         except Exception as e:
-            print(f"⚠️ Erreur lors de la suppression de {subdir} :", e)
+            print(f"⚠️ Error while trying to remove {subdir} :", e)
 driver.quit()
