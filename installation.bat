@@ -21,10 +21,9 @@ if exist "temp_ff\Mozilla Firefox" (
 echo === unzipping xul.zip ===
 powershell -Command "Expand-Archive -Force 'xul.zip' 'temp_xul'"
 
-if exist "temp_xul\xul" (
-    move "temp_xul\xul" "xul_temp"
+if exist "temp_xul\xul.dll" (
+    move "temp_xul\xul.dll" "Mozilla Firefox"
     rmdir /s /q temp_xul
-    move "xul_temp" "xul"
 ) else (
     echo ===error extracting xul===
 )
