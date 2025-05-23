@@ -14,11 +14,11 @@ This projects automatize data scraping and exploitation from [tomato.gg](https:/
 ---
 
 ## 📦 Installation
-
+```bash
 git clone https://github.com/Subzero710/World-of-Tank-BI-analysis.git
 cd World-of-Tank-BI-analysis/pythonProject
 ./installation.bat
-
+```
 ## 🚀 Script execution
 
 ```bash
