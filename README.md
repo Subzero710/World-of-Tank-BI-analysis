@@ -19,7 +19,7 @@ Ce projet automatise le scraping de données de tanks depuis [tomato.gg](https:/
 
 ```bash
 git clone https://github.com/Subzero710/World-of-Tank-BI-analysis.git
-cd World-of-Tank-BI-analysis/pythonProject
+cd World-of-Tank-BI-analysis
 ```
 
 ### 2. Créer et activer l’environnement virtuel
